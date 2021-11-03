@@ -1,0 +1,124 @@
+openapi: 3.0.2
+info:
+  version: 0.1.0
+  title: Temperature Readings API
+  description: An API to save and fetch temperature sensor data.
+  termsOfService: http://swagger.io/terms/
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+servers:
+- url: https://localhost:8080/
+tags:
+- name: temperature
+  description: Operations about temperature
+paths:
+  /temperature/save:
+    post:
+      tags:
+      - save
+      summary: Save temperature
+      description: Save temperature
+      operationId: saveTemperature
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemperatureReading'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /temperature/bulk-save:
+    post:
+      tags:
+      - save
+      summary: Bulk Save temperature
+      description: Bulk Save temperature
+      operationId: bulkSaveTemperature
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TemperatureReading'
+        required: true
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Unexpected Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /temperature/fetch:
+    get:
+      tags:
+      - fetch
+      summary: Fetch Temperature Data
+      operationId: fetchTemperature
+      parameters:
+      - name: start
+        in: query
+        description: 'The start time for fetching temperature readings'
+        required: true
+        schema:
+          type: string
+      - name: end
+        in: query
+        description: 'The end time for fetching temperature readings'
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TemperatureReading'
+        404:
+          description: Data not found
+components:
+  schemas:
+    TemperatureReading:
+      type: object
+      required:
+        [temperature, recordedAt]
+      properties:
+        temperature:
+          type: string
+          example: "27°C"
+        recordedAt:
+          type: string
+          format: date-time
+          description: Recorded time in ISO 8601 full-time format.
+          example: "2021-08-30T08:30:00Z"
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Some Error Message
